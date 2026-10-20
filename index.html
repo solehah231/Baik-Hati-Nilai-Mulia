@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="ms" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Super Mario Moral Quest - Pendidikan Moral Tahun 3</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fredoka:wght@400;600;700&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            mario: {
+              red: '#E52521',
+              blue: '#00247D',
+              sky: '#5C94FC',
+              yellow: '#FCD800',
+              green: '#00A800',
+              pipe: '#00CC00',
+              brick: '#B84400',
+              ground: '#E06C00'
+            }
+          },
+          fontFamily: {
+            retro: ['"Press Start 2P"', 'cursive'],
+            fredoka: ['"Fredoka"', 'sans-serif'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Fredoka', 'Plus Jakarta Sans', sans-serif;
+      background-color: #0f172a;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+      overflow-x: hidden;
+    }
+
+    .retro-font { font-family: 'Press Start 2P', cursive; }
+
+    .pixel-box {
+      border: 4px solid #000;
+      box-shadow: 6px 6px 0px #000;
+    }
+
+    .pixel-btn {
+      border: 4px solid #000;
+      box-shadow: 0 6px 0 #000;
+      transition: all 0.1s ease;
+    }
+
+    .pixel-btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 #000;
+    }
+
+    @keyframes spinCoin {
+      0%, 100% { transform: scaleX(1); }
+      50% { transform: scaleX(0.2); }
+    }
+    .coin-spin {
+      display: inline-block;
+      animation: spinCoin 0.8s infinite ease-in-out;
+    }
+
+    .ctrl-btn {
+      background: rgba(255, 255, 255, 0.25);
+      border: 3px solid #000;
+      box-shadow: 0 4px 0 #000;
+      backdrop-filter: blur(4px);
+    }
+    .ctrl-btn:active {
+      background: rgba(255, 216, 0, 0.85);
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #000;
+    }
+
+    @media print {
+      body * { visibility: hidden; }
+      #certificate-modal, #certificate-modal * { visibility: visible; }
+      #certificate-modal {
+        position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+        background: white !important;
+      }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between text-slate-800 bg-slate-900">
+
+  <!-- TOP HUD BAR (VISIBLE IN GAME) -->
+  <header id="top-hud" class="bg-mario-red text-white border-b-4 border-black p-2 sm:p-3 hidden z-30 relative shadow-lg">
+    <div class="max-w-4xl mx-auto flex justify-between items-center text-xs sm:text-sm font-bold retro-font">
+      <div class="flex items-center gap-2">
+        <span class="text-mario-yellow">MARIO</span>
+        <span id="hud-player-name" class="text-white truncate max-w-[120px] sm:max-w-[180px]">-</span>
+      </div>
+      <div class="flex items-center gap-1 bg-black/40 px-3 py-1 rounded-full border-2 border-yellow-400">
+        <span class="text-mario-yellow coin-spin">🪙</span>
+        <span class="text-mario-yellow"><span id="hud-coins">0000</span></span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="btn-sound-toggle" onclick="toggleSound()" class="bg-black/50 hover:bg-black/70 px-2 py-1 rounded border border-white text-xs">
+          🔊 AUDIO: ON
+        </button>
+        <span class="hidden sm:inline">SOALAN:</span>
+        <span id="hud-questions-cleared" class="text-mario-yellow">0/5</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="flex-grow flex items-center justify-center p-2 sm:p-4 max-w-5xl w-full mx-auto relative">
+
+    <!-- ======================================================== -->
+    <!-- 1. SKRIN UTAMA / BORANG PENDAFTARAN                       -->
+    <!-- ======================================================== -->
+    <section id="screen-main" class="w-full max-w-lg bg-mario-sky border-4 border-black rounded-3xl p-5 sm:p-8 pixel-box bg-gradient-to-b from-sky-400 to-sky-200 shadow-2xl relative">
+      <div class="text-center mb-6">
+        <div class="inline-block bg-mario-green text-white text-xs px-3 py-1 rounded-full border-2 border-black retro-font uppercase mb-2 animate-bounce">
+          Pendidikan Moral Tahun 3
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-black text-mario-yellow stroke-black tracking-wide drop-shadow-[0_4px_0_#000] retro-font uppercase leading-tight">
+          SUPER MARIO<br>
+          <span class="text-white text-xl sm:text-2xl block mt-2 font-black font-fredoka">BAIK HATI NILAI MULIA</span>
+        </h1>
+        <p class="text-slate-900 text-xs sm:text-sm font-bold mt-2 bg-yellow-300 inline-block px-3 py-1 rounded-lg border-2 border-black">
+          ❤️ Kutip Syiling &amp; Jawab Soalan Amalan Baik Hati!
+        </p>
+      </div>
+
+      <form id="start-form" onsubmit="handleStartForm(event)" class="space-y-4 bg-yellow-100 border-4 border-black p-5 rounded-2xl shadow-inner">
+        <div>
+          <label for="input-name" class="block text-xs font-bold retro-font text-slate-800 mb-1">👤 NAMA MURID:</label>
+          <input type="text" id="input-name" required placeholder="Contoh: Adam Haris" class="w-full px-4 py-3 rounded-xl border-4 border-black font-bold focus:outline-none focus:ring-4 focus:ring-mario-yellow text-slate-900">
+        </div>
+        <div>
+          <label for="input-class" class="block text-xs font-bold retro-font text-slate-800 mb-1">🏫 KELAS:</label>
+          <input type="text" id="input-class" required placeholder="Contoh: 3 Bijak" class="w-full px-4 py-3 rounded-xl border-4 border-black font-bold focus:outline-none focus:ring-4 focus:ring-mario-yellow text-slate-900">
+        </div>
+
+        <div class="grid grid-cols-1 gap-2 pt-2">
+          <button type="submit" class="w-full bg-mario-green hover:bg-green-600 text-white font-bold py-4 rounded-2xl pixel-btn retro-font text-xs sm:text-sm flex items-center justify-center gap-3">
+            <span>🎮 MULA BERMAIN</span>
+            <span class="text-lg">➔</span>
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- 2. NOTA RINGKAS (WORLD 1: TAMAN NILAI MULIA)              -->
+    <!-- ======================================================== -->
+    <section id="screen-notes" class="w-full bg-white border-4 border-black rounded-3xl p-4 sm:p-6 pixel-box shadow-2xl hidden relative">
+      <div class="flex justify-between items-center mb-4 pb-2 border-b-4 border-black">
+        <div>
+          <span class="bg-mario-blue text-white text-xs px-2 py-1 rounded-full border border-black font-bold retro-font">WORLD 1</span>
+          <h2 class="text-lg sm:text-2xl font-black text-mario-red mt-1">❤️ NOTA: TAMAN NILAI MULIA</h2>
+        </div>
+        <span class="text-3xl">🤝</span>
+      </div>
+
+      <p class="text-xs sm:text-sm font-bold text-slate-700 mb-4">
+        Fahami nota Pendidikan Moral ini sebelum membantu Mario mengumpul syiling di Mushroom Kingdom:
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+        <!-- Maksud Baik Hati -->
+        <div class="bg-rose-50 p-3 rounded-xl border-2 border-black">
+          <h3 class="font-bold text-mario-red text-xs sm:text-sm mb-2 border-b border-black pb-1 flex items-center gap-1">
+            <span>❤️</span> Maksud Baik Hati
+          </h3>
+          <p class="text-xs text-slate-700 font-semibold leading-relaxed">
+            Sikap memberikan bantuan dan sokongan moral secara <strong>ikhlas</strong> kepada jiran, rakan, keluarga, orang tua, dan haiwan tanpa mengharapkan balasan.
+          </p>
+        </div>
+
+        <!-- Contoh Sikap Baik Hati -->
+        <div class="bg-emerald-50 p-3 rounded-xl border-2 border-black">
+          <h3 class="font-bold text-mario-green text-xs sm:text-sm mb-2 border-b border-black pb-1 flex items-center gap-1">
+            <span>🌟</span> Contoh Amalan Baik Hati
+          </h3>
+          <ul class="text-xs space-y-1 text-slate-700 font-semibold">
+            <li>• Menolong jiran mengangkat barang yang berat.</li>
+            <li>• Membantu rakan yang jatuh dari basikal.</li>
+            <li>• Memberi makanan &amp; minuman kepada haiwan yang kelaparan.</li>
+            <li>• Mendermakan pakaian/wang kepada mangsa bencana.</li>
+          </ul>
+        </div>
+
+        <!-- Kepentingan / Kebaikan -->
+        <div class="bg-amber-50 p-3 rounded-xl border-2 border-black">
+          <h3 class="font-bold text-amber-900 text-xs sm:text-sm mb-2 border-b border-black pb-1 flex items-center gap-1">
+            <span>✨</span> Kepentingan Bersikap Baik Hati
+          </h3>
+          <ul class="text-xs space-y-1 text-slate-700 font-semibold">
+            <li>• Mengeratkan hubungan silaturahim sesama jiran.</li>
+            <li>• Mewujudkan suasana masyarakat yang harmoni &amp; aman.</li>
+            <li>• Disukai dan dihormati oleh orang ramai.</li>
+            <li>• Hati terasa tenang, gembira, dan puas.</li>
+          </ul>
+        </div>
+
+        <!-- Kesan Tidak Baik Hati -->
+        <div class="bg-slate-100 p-3 rounded-xl border-2 border-black">
+          <h3 class="font-bold text-slate-800 text-xs sm:text-sm mb-2 border-b border-black pb-1 flex items-center gap-1">
+            <span>⚠️</span> Kesan Tidak Bersikap Baik Hati
+          </h3>
+          <ul class="text-xs space-y-1 text-slate-700 font-semibold">
+            <li>• Hubungan dengan jiran &amp; rakan menjadi renggang.</li>
+            <li>• Orang lain berasa bersedih dan terbiar.</li>
+            <li>• Tiada sesiapa membantu kita semasa kita dalam kesusahan.</li>
+          </ul>
+        </div>
+      </div>
+
+      <button onclick="startPlatformerGame()" class="w-full bg-mario-yellow hover:bg-yellow-400 text-slate-900 border-4 border-black font-black py-4 rounded-2xl pixel-btn retro-font text-xs sm:text-sm flex items-center justify-center gap-2">
+        <span>🎮 TERUS KE PERMAINAN MARIO!</span>
+        <span>➔</span>
+      </button>
+    </section>
+
+    <!-- ========================================================== -->
+    <!-- 3. GAME CANVAS PLATFORMER 2D                                 -->
+    <!-- ========================================================== -->
+    <section id="screen-game" class="w-full flex flex-col items-center hidden relative">
+      <div class="relative w-full max-w-4xl bg-mario-sky border-4 border-black rounded-2xl overflow-hidden pixel-box shadow-2xl">
+        <canvas id="gameCanvas" width="800" height="400" class="w-full h-auto block bg-mario-sky"></canvas>
+
+        <!-- IN-GAME QUIZ MODAL -->
+        <div id="quiz-modal" class="absolute inset-0 bg-black/80 z-40 flex items-center justify-center p-3 hidden">
+          <div class="bg-white border-4 border-black rounded-2xl p-4 sm:p-6 max-w-lg w-full text-center pixel-box relative">
+            <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-mario-yellow border-2 border-black px-4 py-1 rounded-full retro-font text-xs font-black">
+              BONGKAH MISTERI [?]
+            </div>
+            
+            <p class="text-xs font-bold text-slate-500 mt-2 mb-1">Pendidikan Moral Tahun 3 (Baik Hati):</p>
+            <div id="modal-question-text" class="text-sm sm:text-lg font-black text-slate-900 mb-4 bg-yellow-50 p-3 rounded-xl border-2 border-black leading-snug">
+              - Soalan -
+            </div>
+
+            <div id="modal-options-container" class="grid grid-cols-1 gap-2 mb-3"></div>
+
+            <div id="modal-feedback" class="hidden p-2 text-xs font-bold rounded-lg border-2 border-black"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOUCH CONTROLS -->
+      <div class="w-full max-w-4xl flex justify-between items-center mt-3 px-2 sm:px-4">
+        <div class="flex gap-2">
+          <button id="btn-left" class="ctrl-btn w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center text-2xl font-bold text-white">◀</button>
+          <button id="btn-right" class="ctrl-btn w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center text-2xl font-bold text-white">▶</button>
+        </div>
+        
+        <div class="hidden sm:block text-center text-slate-300 text-xs font-bold retro-font">
+          <div>KAWALAN: ⬅️ ➡️ ATAU A / D</div>
+          <div>LOMPAT: [SPACE] ATAU ⬆️</div>
+        </div>
+
+        <button id="btn-jump" class="ctrl-btn bg-mario-yellow/80 w-16 h-16 sm:w-20 sm:h-16 rounded-2xl flex items-center justify-center text-xl font-black text-black">
+          LOMPAT ⬆️
+        </button>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- 4. KEPUTUSAN & SIJIL                                      -->
+    <!-- ======================================================== -->
+    <section id="screen-result" class="w-full max-w-lg bg-white border-4 border-black rounded-3xl p-6 shadow-2xl hidden relative text-center pixel-box">
+      <div class="text-4xl mb-2 animate-bounce">❤️</div>
+      <h2 class="text-2xl sm:text-3xl font-black text-mario-green retro-font mb-2">SYABAS &amp; TAHNIAH!</h2>
+      <p class="text-slate-600 font-bold text-xs sm:text-sm mb-4">Anda telah berjaya menyelesaikan Misi Baik Hati Mario!</p>
+
+      <div class="bg-yellow-50 border-4 border-black rounded-2xl p-4 mb-4 text-left space-y-2">
+        <div id="result-badge" class="text-center text-4xl mb-1">🌟</div>
+        <div id="result-title" class="text-center text-base sm:text-lg font-black retro-font text-mario-red">
+          DUTA BAIK HATI SUPER MARIO MASTER
+        </div>
+        <hr class="border-black border-t-2 my-2">
+        <div class="text-xs font-bold text-slate-700 space-y-1">
+          <div>👤 Nama: <span id="result-name" class="text-black">-</span></div>
+          <div>🏫 Kelas: <span id="result-class" class="text-black">-</span></div>
+          <div>🪙 Jumlah Mata / Syiling: <span id="result-coins" class="text-amber-600 font-black">0</span></div>
+          <div>✅ Soalan Betul: <span id="result-score" class="text-mario-green font-black">0/5</span></div>
+          <div>📊 Ketepatan: <span id="result-accuracy" class="text-mario-blue font-black">0%</span></div>
+          <div>📅 Tarikh: <span id="result-date" class="text-black">-</span></div>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-2">
+        <button onclick="openCertificateModal()" class="flex-1 bg-mario-green hover:bg-green-600 text-white font-bold py-3 px-4 rounded-xl border-3 border-black pixel-btn retro-font text-xs">
+          📜 LIHAT SIJIL
+        </button>
+        <button onclick="restartGame()" class="flex-1 bg-mario-yellow hover:bg-yellow-400 text-slate-900 font-bold py-3 px-4 rounded-xl border-3 border-black pixel-btn retro-font text-xs">
+          🔄 MAIN SEMULA
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- SIJIL PENCAPAIAN MODAL                                   -->
+  <!-- ======================================================== -->
+  <div id="certificate-modal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white border-8 border-mario-yellow rounded-2xl p-6 max-w-xl w-full shadow-2xl relative text-center border-dashed">
+      <button onclick="closeCertificateModal()" class="no-print absolute top-3 right-3 bg-mario-red text-white w-8 h-8 rounded-full font-bold border-2 border-black">✕</button>
+
+      <div class="border-b-4 border-black pb-3 mb-3">
+        <div class="text-2xl mb-1">❤️ ⭐️ 🤝</div>
+        <h2 class="text-xl sm:text-2xl font-black retro-font text-mario-red">SIJIL PENCAPAIAN</h2>
+        <p class="text-xs font-bold text-slate-600 uppercase">PENDIDIKAN MORAL TAHUN 3: BAIK HATI NILAI MULIA</p>
+      </div>
+
+      <div class="space-y-2 my-4">
+        <p class="text-xs text-slate-500 font-bold">DENGAN INI DIPERAKUKAN BAHAWA</p>
+        <h3 id="cert-name" class="text-xl sm:text-2xl font-black text-mario-blue underline decoration-yellow-400">
+          - NAMA MURID -
+        </h3>
+        <p class="text-xs font-bold text-slate-700">dari Kelas <span id="cert-class" class="text-black underline">-</span></p>
+        <p class="text-xs text-slate-600">Telah berjaya menguasai topik Baik Hati Nilai Mulia &amp; Amalan Membantu dalam permainan Super Mario Moral Quest!</p>
+
+        <div class="inline-block bg-yellow-100 border-2 border-black px-4 py-1.5 rounded-xl text-xs sm:text-sm font-black text-mario-red retro-font mt-2" id="cert-title">
+          DUTA BAIK HATI SUPER MARIO MASTER
+        </div>
+
+        <div class="flex justify-center gap-4 mt-3 text-xs font-bold">
+          <div>Markah Soalan: <span id="cert-score" class="text-mario-green">5/5</span></div>
+          <div>Mata Syiling: <span id="cert-coins" class="text-amber-600">500 🪙</span></div>
+        </div>
+      </div>
+
+      <div class="pt-4 border-t-2 border-gray-300 flex justify-between items-end text-left text-xs font-bold text-slate-600">
+        <div>
+          <div>Tarikh: <span id="cert-date">-</span></div>
+          <div>Modul Pendidikan Moral Tahun 3</div>
+        </div>
+        <div class="text-right">
+          <div class="text-xl">✍️</div>
+          <div class="italic">Guru Pendidikan Moral</div>
+        </div>
+      </div>
+
+      <div class="mt-4 no-print">
+        <button onclick="window.print()" class="bg-mario-blue text-white font-bold py-2.5 px-6 rounded-xl border-3 border-black pixel-btn retro-font text-xs">
+          🖨️ CETAK SIJIL / SIMPAN PDF
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-slate-950 text-slate-400 text-center py-2 text-xs border-t-2 border-black">
+    ❤️ Permainan Pendidikan Moral Tahun 3: Baik Hati Nilai Mulia
+  </footer>
+
+  <!-- ======================================================== -->
+  <!-- JAVASCRIPT: GAME ENGINE & LOGIC                          -->
+  <!-- ======================================================== -->
+  <script>
+    /* 1. STATE & DATA */
+    let playerData = {
+      name: '',
+      className: '',
+      coins: 0,
+      questionsCleared: 0,
+      totalQuestions: 5,
+      soundEnabled: true
+    };
+
+    const gameQuestions = [
+      {
+        question: "Apakah yang perlu kamu lakukan apabila melihat jiran kamu mengangkat barang yang berat?",
+        options: [
+          "Pura-pura tidak nampak dan terus berlalu pergi",
+          "Membantu jiran mengangkat barang dengan ikhlas",
+          "Ketawakan jiran yang kelihatan letih"
+        ],
+        correct: 1,
+        explanation: "Membantu jiran mengangkat barang berat menunjukkan sikap baik hati dan memupuk hubungan kejiranan yang mesra."
+      },
+      {
+        question: "Rakan kamu terjatuh dari basikal dan lututnya terluka. Apakah tindakan yang menunjukkan sikap baik hati?",
+        options: [
+          "Membantu rakan bangun dan merawat lukanya",
+          "Menyuruh rakan lain mengejek dia",
+          "Tinggalkan dia berseorangan tanpa bantuan"
+        ],
+        correct: 0,
+        explanation: "Menolong rakan yang tercedera merupakan nilai baik hati dan prihatin terhadap kesusahan orang lain."
+      },
+      {
+        question: "Mengapakah kita perlu bersikap baik hati dan membantu orang lain yang dalam kesusahan?",
+        options: [
+          "Untuk menunjuk-nunjuk kehebatan diri",
+          "Untuk mendapat ganjaran wang yang banyak",
+          "Untuk mengeratkan hubungan dan mewujudkan masyarakat yang harmoni"
+        ],
+        correct: 2,
+        explanation: "Amalan baik hati tanpa mengharapkan balasan dapat mewujudkan suasana hidup yang aman dan harmoni."
+      },
+      {
+        question: "Ali melihat seekor kucing kelaparan di tepi jalan. Tindakan Ali yang mencerminkan nilai baik hati ialah...",
+        options: [
+          "Mendorong kucing itu ke tepi jalan",
+          "Memberi kucing itu makanan dan air",
+          "Baling batu ke arah kucing tersebut"
+        ],
+        correct: 1,
+        explanation: "Penyayang dan baik hati bukan sahaja sesama manusia, malah merangkumi belas kasihan terhadap haiwan."
+      },
+      {
+        question: "Apakah perasaan kamu selepas memberikan bantuan kepada rakan atau jiran?",
+        options: [
+          "Marah dan gundah-gulana",
+          "Rasa gembira, tenang, dan puas hati",
+          "Rasa sombong dan bangga diri"
+        ],
+        correct: 1,
+        explanation: "Perbuatan baik hati yang dilakukan secara ikhlas akan mendatangkan ketenangan dan kegembiraan dalam diri."
+      }
+    ];
+
+    /* 2. AUDIO SYNTHESIZER (WEB AUDIO API) */
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) audioCtx = new AudioContext();
+    }
+
+    function toggleSound() {
+      playerData.soundEnabled = !playerData.soundEnabled;
+      const btn = document.getElementById('btn-sound-toggle');
+      btn.innerText = playerData.soundEnabled ? "🔊 AUDIO: ON" : "🔇 AUDIO: OFF";
+    }
+
+    function playSound(type) {
+      if (!playerData.soundEnabled) return;
+      initAudio();
+      if (!audioCtx) return;
+
+      const now = audioCtx.currentTime;
+
+      if (type === 'coin') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(987.77, now);
+        osc.frequency.setValueAtTime(1318.51, now + 0.08);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(now); osc.stop(now + 0.25);
+      } 
+      else if (type === 'jump') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(160, now);
+        osc.frequency.exponentialRampToValueAtTime(480, now + 0.12);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(now); osc.stop(now + 0.12);
+      }
+      else if (type === 'block') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(260, now);
+        osc.frequency.setValueAtTime(520, now + 0.05);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(now); osc.stop(now + 0.2);
+      }
+      else if (type === 'correct') {
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, i) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + i * 0.08);
+          gain.gain.setValueAtTime(0.2, now + i * 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + (i + 1) * 0.08);
+          osc.connect(gain); gain.connect(audioCtx.destination);
+          osc.start(now + i * 0.08); osc.stop(now + (i + 1) * 0.08);
+        });
+      }
+      else if (type === 'wrong') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.linearRampToValueAtTime(90, now + 0.25);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(now); osc.stop(now + 0.25);
+      }
+      else if (type === 'win') {
+        const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99];
+        notes.forEach((freq, i) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now + i * 0.1);
+          gain.gain.setValueAtTime(0.2, now + i * 0.1);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + (i + 1) * 0.1);
+          osc.connect(gain); gain.connect(audioCtx.destination);
+          osc.start(now + i * 0.1); osc.stop(now + (i + 1) * 0.1);
+        });
+      }
+    }
+
+    /* 3. NAVIGATION */
+    function handleStartForm(e) {
+      e.preventDefault();
+      initAudio();
+      playSound('coin');
+
+      playerData.name = document.getElementById('input-name').value.trim();
+      playerData.className = document.getElementById('input-class').value.trim();
+
+      document.getElementById('hud-player-name').innerText = playerData.name.toUpperCase();
+      showScreen('screen-notes');
+    }
+
+    function showScreen(id) {
+      ['screen-main', 'screen-notes', 'screen-game', 'screen-result'].forEach(s => {
+        document.getElementById(s).classList.add('hidden');
+      });
+      document.getElementById(id).classList.remove('hidden');
+
+      if (id === 'screen-game') {
+        document.getElementById('top-hud').classList.remove('hidden');
+      } else if (id === 'screen-main' || id === 'screen-notes') {
+        document.getElementById('top-hud').classList.add('hidden');
+      }
+    }
+
+    function startPlatformerGame() {
+      showScreen('screen-game');
+      initCanvasGame();
+    }
+
+    /* 4. CANVAS PLATFORMER ENGINE */
+    let canvas, ctx;
+    let gameLoopId = null;
+    let gamePaused = false;
+    let activeBlockQuestion = null;
+
+    const keys = { left: false, right: false, jump: false };
+    let cameraX = 0;
+
+    const mario = {
+      x: 50, y: 280, width: 28, height: 36,
+      vx: 0, vy: 0, speed: 3.5, gravity: 0.45, jumpForce: -10.5,
+      grounded: false, facing: 'right'
+    };
+
+    let platforms = [];
+    let coins = [];
+    let questionBlocks = [];
+    let flagpole = { x: 2200, y: 100, width: 12, height: 220 };
+
+    function initLevelData() {
+      cameraX = 0;
+      mario.x = 50; mario.y = 280; mario.vx = 0; mario.vy = 0;
+      playerData.coins = 0; playerData.questionsCleared = 0;
+      updateHUD();
+
+      platforms = [
+        { x: 0, y: 350, width: 700, height: 50 },
+        { x: 780, y: 350, width: 650, height: 50 },
+        { x: 1500, y: 350, width: 800, height: 50 },
+        { x: 300, y: 290, width: 40, height: 60, type: 'pipe' },
+        { x: 550, y: 260, width: 40, height: 90, type: 'pipe' },
+        { x: 920, y: 250, width: 120, height: 20, type: 'brick' },
+        { x: 1250, y: 220, width: 100, height: 20, type: 'brick' },
+        { x: 1650, y: 270, width: 40, height: 80, type: 'pipe' },
+        { x: 1900, y: 290, width: 140, height: 60, type: 'brick' }
+      ];
+
+      coins = [
+        { x: 180, y: 310, collected: false },
+        { x: 210, y: 310, collected: false },
+        { x: 240, y: 310, collected: false },
+        { x: 420, y: 280, collected: false },
+        { x: 450, y: 280, collected: false },
+        { x: 940, y: 200, collected: false },
+        { x: 970, y: 200, collected: false },
+        { x: 1000, y: 200, collected: false },
+        { x: 1280, y: 170, collected: false },
+        { x: 1750, y: 310, collected: false },
+        { x: 1800, y: 310, collected: false }
+      ];
+
+      questionBlocks = [
+        { x: 220, y: 230, width: 32, height: 32, questionIndex: 0, hit: false },
+        { x: 480, y: 210, width: 32, height: 32, questionIndex: 1, hit: false },
+        { x: 860, y: 220, width: 32, height: 32, questionIndex: 2, hit: false },
+        { x: 1180, y: 190, width: 32, height: 32, questionIndex: 3, hit: false },
+        { x: 1820, y: 210, width: 32, height: 32, questionIndex: 4, hit: false }
+      ];
+    }
+
+    function initCanvasGame() {
+      canvas = document.getElementById('gameCanvas');
+      ctx = canvas.getContext('2d');
+
+      initLevelData();
+      setupControlListeners();
+
+      gamePaused = false;
+      if (gameLoopId) cancelAnimationFrame(gameLoopId);
+      gameLoop();
+    }
+
+    /* 5. INPUT LISTENERS */
+    function setupControlListeners() {
+      window.onkeydown = (e) => {
+        if (gamePaused) return;
+        if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = true;
+        if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = true;
+        if (e.key === 'ArrowUp' || e.key === ' ' || e.key === 'w' || e.key === 'W') {
+          if (!keys.jump && mario.grounded) {
+            mario.vy = mario.jumpForce;
+            mario.grounded = false;
+            playSound('jump');
+          }
+          keys.jump = true;
+        }
+      };
+
+      window.onkeyup = (e) => {
+        if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = false;
+        if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = false;
+        if (e.key === 'ArrowUp' || e.key === ' ' || e.key === 'w' || e.key === 'W') keys.jump = false;
+      };
+
+      bindTouchBtn('btn-left', 'left');
+      bindTouchBtn('btn-right', 'right');
+
+      const jumpBtn = document.getElementById('btn-jump');
+      jumpBtn.ontouchstart = (e) => { e.preventDefault(); triggerJump(); };
+      jumpBtn.onmousedown = (e) => { e.preventDefault(); triggerJump(); };
+    }
+
+    function bindTouchBtn(id, dir) {
+      const btn = document.getElementById(id);
+      btn.ontouchstart = (e) => { e.preventDefault(); keys[dir] = true; };
+      btn.ontouchend = (e) => { e.preventDefault(); keys[dir] = false; };
+      btn.onmousedown = (e) => { e.preventDefault(); keys[dir] = true; };
+      btn.onmouseup = (e) => { e.preventDefault(); keys[dir] = false; };
+    }
+
+    function triggerJump() {
+      if (!gamePaused && mario.grounded) {
+        mario.vy = mario.jumpForce;
+        mario.grounded = false;
+        playSound('jump');
+      }
+    }
+
+    /* 6. GAME LOOP & PHYSICS */
+    function gameLoop() {
+      if (!gamePaused) {
+        updatePhysics();
+        renderCanvas();
+      }
+      gameLoopId = requestAnimationFrame(gameLoop);
+    }
+
+    function updatePhysics() {
+      if (keys.left) {
+        mario.vx = -mario.speed; mario.facing = 'left';
+      } else if (keys.right) {
+        mario.vx = mario.speed; mario.facing = 'right';
+      } else {
+        mario.vx = 0;
+      }
+
+      mario.vy += mario.gravity;
+      mario.x += mario.vx;
+      mario.y += mario.vy;
+
+      if (mario.x < 0) mario.x = 0;
+
+      if (mario.y > 450) {
+        mario.x = Math.max(50, cameraX + 50);
+        mario.y = 200; mario.vy = 0;
+        playSound('wrong');
+      }
+
+      mario.grounded = false;
+      platforms.forEach(plat => {
+        if (
+          mario.x < plat.x + plat.width &&
+          mario.x + mario.width > plat.x &&
+          mario.y < plat.y + plat.height &&
+          mario.y + mario.height > plat.y
+        ) {
+          if (mario.vy > 0 && mario.y + mario.height - mario.vy <= plat.y + 10) {
+            mario.y = plat.y - mario.height;
+            mario.vy = 0; mario.grounded = true;
+          } else if (mario.vx > 0 && mario.x + mario.width - mario.vx <= plat.x) {
+            mario.x = plat.x - mario.width;
+          } else if (mario.vx < 0 && mario.x - mario.vx >= plat.x + plat.width) {
+            mario.x = plat.x + plat.width;
+          }
+        }
+      });
+
+      coins.forEach(c => {
+        if (!c.collected && Math.hypot((mario.x + 14) - c.x, (mario.y + 18) - c.y) < 22) {
+          c.collected = true;
+          playerData.coins += 50;
+          updateHUD();
+          playSound('coin');
+        }
+      });
+
+      questionBlocks.forEach(qb => {
+        if (!qb.hit) {
+          if (
+            mario.x < qb.x + qb.width &&
+            mario.x + mario.width > qb.x &&
+            mario.y < qb.y + qb.height &&
+            mario.y + mario.height > qb.y
+          ) {
+            if (mario.vy < 0 && mario.y >= qb.y + qb.height - 12) {
+              mario.vy = 2;
+              qb.hit = true;
+              playSound('block');
+              openInGameQuiz(qb.questionIndex);
+            } else if (mario.vy > 0 && mario.y + mario.height - mario.vy <= qb.y + 8) {
+              mario.y = qb.y - mario.height;
+              mario.vy = 0; mario.grounded = true;
+            }
+          }
+        }
+      });
+
+      if (mario.x + mario.width >= flagpole.x) {
+        finishGameSuccess();
+      }
+
+      cameraX = Math.max(0, mario.x - 250);
+    }
+
+    /* 7. CANVAS RENDERING */
+    function renderCanvas() {
+      ctx.fillStyle = '#5C94FC';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.save();
+      ctx.translate(-cameraX, 0);
+
+      // Clouds
+      ctx.fillStyle = '#FFFFFF';
+      drawCloud(150, 80); drawCloud(500, 60); drawCloud(1100, 90); drawCloud(1700, 70);
+
+      // Platforms
+      platforms.forEach(p => {
+        if (p.type === 'pipe') {
+          ctx.fillStyle = '#00CC00';
+          ctx.fillRect(p.x, p.y, p.width, p.height);
+          ctx.strokeStyle = '#000000'; ctx.lineWidth = 3;
+          ctx.strokeRect(p.x, p.y, p.width, p.height);
+          ctx.fillStyle = '#00EE00';
+          ctx.fillRect(p.x - 4, p.y, p.width + 8, 16);
+          ctx.strokeRect(p.x - 4, p.y, p.width + 8, 16);
+        } else if (p.type === 'brick') {
+          ctx.fillStyle = '#B84400';
+          ctx.fillRect(p.x, p.y, p.width, p.height);
+          ctx.strokeStyle = '#000000'; ctx.lineWidth = 2;
+          ctx.strokeRect(p.x, p.y, p.width, p.height);
+        } else {
+          ctx.fillStyle = '#E06C00';
+          ctx.fillRect(p.x, p.y, p.width, p.height);
+          ctx.fillStyle = '#00A800';
+          ctx.fillRect(p.x, p.y, p.width, 12);
+          ctx.strokeStyle = '#000000'; ctx.lineWidth = 3;
+          ctx.strokeRect(p.x, p.y, p.width, p.height);
+        }
+      });
+
+      // Coins
+      coins.forEach(c => {
+        if (!c.collected) {
+          ctx.fillStyle = '#FCD800';
+          ctx.beginPath();
+          ctx.arc(c.x, c.y, 8, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = '#000000'; ctx.lineWidth = 2;
+          ctx.stroke();
+        }
+      });
+
+      // Question Blocks
+      questionBlocks.forEach(qb => {
+        if (!qb.hit) {
+          ctx.fillStyle = '#FCD800';
+          ctx.fillRect(qb.x, qb.y, qb.width, qb.height);
+          ctx.strokeStyle = '#000000'; ctx.lineWidth = 3;
+          ctx.strokeRect(qb.x, qb.y, qb.width, qb.height);
+
+          ctx.fillStyle = '#000000';
+          ctx.font = 'bold 18px "Press Start 2P", sans-serif';
+          ctx.fillText('?', qb.x + 8, qb.y + 24);
+        } else {
+          ctx.fillStyle = '#885522';
+          ctx.fillRect(qb.x, qb.y, qb.width, qb.height);
+          ctx.strokeStyle = '#000000'; ctx.lineWidth = 3;
+          ctx.strokeRect(qb.x, qb.y, qb.width, qb.height);
+        }
+      });
+
+      // Flagpole
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(flagpole.x, flagpole.y, flagpole.width, flagpole.height);
+      ctx.strokeStyle = '#000'; ctx.lineWidth = 2;
+      ctx.strokeRect(flagpole.x, flagpole.y, flagpole.width, flagpole.height);
+      
+      ctx.fillStyle = '#FCD800';
+      ctx.beginPath();
+      ctx.arc(flagpole.x + 6, flagpole.y - 10, 12, 0, Math.PI * 2);
+      ctx.fill(); ctx.stroke();
+
+      ctx.fillStyle = '#00A800';
+      ctx.fillRect(flagpole.x + 12, flagpole.y + 10, 45, 30);
+      ctx.strokeRect(flagpole.x + 12, flagpole.y + 10, 45, 30);
+
+      // Mario
+      drawMarioSprite(mario.x, mario.y, mario.facing);
+
+      ctx.restore();
+    }
+
+    function drawCloud(x, y) {
+      ctx.beginPath();
+      ctx.arc(x, y, 18, 0, Math.PI * 2);
+      ctx.arc(x + 15, y - 10, 22, 0, Math.PI * 2);
+      ctx.arc(x + 35, y, 18, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function drawMarioSprite(x, y, facing) {
+      ctx.fillStyle = '#E52521';
+      ctx.fillRect(x + 4, y, 20, 10);
+      ctx.fillRect(x + 4, y + 14, 20, 12);
+
+      ctx.fillStyle = '#FFCC99';
+      ctx.fillRect(x + 6, y + 8, 16, 8);
+
+      ctx.fillStyle = '#00247D';
+      ctx.fillRect(x + 6, y + 22, 16, 10);
+
+      ctx.fillStyle = '#663300';
+      ctx.fillRect(x + 4, y + 32, 8, 4);
+      ctx.fillRect(x + 16, y + 32, 8, 4);
+
+      ctx.strokeStyle = '#000000'; ctx.lineWidth = 2;
+      ctx.strokeRect(x + 4, y, 20, 34);
+    }
+
+    /* 8. IN-GAME QUIZ */
+    function openInGameQuiz(qIndex) {
+      gamePaused = true;
+      activeBlockQuestion = gameQuestions[qIndex];
+
+      const modal = document.getElementById('quiz-modal');
+      const qText = document.getElementById('modal-question-text');
+      const container = document.getElementById('modal-options-container');
+      const feedback = document.getElementById('modal-feedback');
+
+      qText.innerText = activeBlockQuestion.question;
+      feedback.classList.add('hidden');
+      container.innerHTML = '';
+
+      activeBlockQuestion.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "w-full bg-white hover:bg-yellow-200 border-3 border-black font-bold p-3 rounded-xl text-center text-xs sm:text-sm pixel-btn leading-snug";
+        btn.innerText = opt;
+        btn.onclick = () => handleAnswerSubmission(idx);
+        container.appendChild(btn);
+      });
+
+      modal.classList.remove('hidden');
+    }
+
+    function handleAnswerSubmission(selectedIndex) {
+      const feedback = document.getElementById('modal-feedback');
+      const container = document.getElementById('modal-options-container');
+
+      Array.from(container.children).forEach(b => b.disabled = true);
+
+      if (selectedIndex === activeBlockQuestion.correct) {
+        playSound('correct');
+        playerData.coins += 100;
+        playerData.questionsCleared += 1;
+        updateHUD();
+
+        feedback.className = "p-3 rounded-xl border-2 border-black text-center font-bold text-xs sm:text-sm bg-green-200 text-green-900 border-green-800";
+        feedback.innerHTML = `🎉 **BETUL!** +100 MATA 🪙<br><span class="font-normal">${activeBlockQuestion.explanation}</span>`;
+      } else {
+        playSound('wrong');
+        feedback.className = "p-3 rounded-xl border-2 border-black text-center font-bold text-xs sm:text-sm bg-red-200 text-red-900 border-red-800";
+        feedback.innerHTML = `❌ **KURANG TEPAT!**<br><span class="font-normal">${activeBlockQuestion.explanation}</span>`;
+      }
+
+      feedback.classList.remove('hidden');
+
+      setTimeout(() => {
+        document.getElementById('quiz-modal').classList.add('hidden');
+        gamePaused = false;
+      }, 2200);
+    }
+
+    function updateHUD() {
+      document.getElementById('hud-coins').innerText = String(playerData.coins).padStart(4, '0');
+      document.getElementById('hud-questions-cleared').innerText = `${playerData.questionsCleared}/${playerData.totalQuestions}`;
+    }
+
+    /* 9. FINISH GAME & CERTIFICATE */
+    function finishGameSuccess() {
+      gamePaused = true;
+      if (gameLoopId) cancelAnimationFrame(gameLoopId);
+
+      playSound('win');
+      showScreen('screen-result');
+
+      const accuracy = Math.round((playerData.questionsCleared / playerData.totalQuestions) * 100);
+
+      let title = "INSAN BAIK HATI MUDA ❤️";
+      let badge = "🤝";
+
+      if (playerData.questionsCleared >= 4) {
+        title = "DUTA BAIK HATI SUPER MARIO MASTER 🌟";
+        badge = "🌟";
+      } else if (playerData.questionsCleared >= 2) {
+        title = "PEJUANG NILAI MULIA 🤝";
+        badge = "❤️";
+      }
+
+      const today = new Date().toLocaleDateString('ms-MY', { year: 'numeric', month: 'long', day: 'numeric' });
+
+      document.getElementById('result-badge').innerText = badge;
+      document.getElementById('result-title').innerText = title;
+      document.getElementById('result-coins').innerText = `${playerData.coins} 🪙`;
+      document.getElementById('result-score').innerText = `${playerData.questionsCleared}/${playerData.totalQuestions}`;
+      document.getElementById('result-accuracy').innerText = `${accuracy}%`;
+      document.getElementById('result-name').innerText = playerData.name;
+      document.getElementById('result-class').innerText = playerData.className;
+      document.getElementById('result-date').innerText = today;
+
+      document.getElementById('cert-name').innerText = playerData.name.toUpperCase();
+      document.getElementById('cert-class').innerText = playerData.className;
+      document.getElementById('cert-title').innerText = title;
+      document.getElementById('cert-score').innerText = `${playerData.questionsCleared}/${playerData.totalQuestions} (${accuracy}%)`;
+      document.getElementById('cert-coins').innerText = `${playerData.coins} 🪙`;
+      document.getElementById('cert-date').innerText = today;
+    }
+
+    function openCertificateModal() {
+      playSound('block');
+      document.getElementById('certificate-modal').classList.remove('hidden');
+    }
+
+    function closeCertificateModal() {
+      document.getElementById('certificate-modal').classList.add('hidden');
+    }
+
+    function restartGame() {
+      playSound('coin');
+      showScreen('screen-main');
+    }
+  </script>
+</body>
+</html>
